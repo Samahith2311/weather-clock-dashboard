@@ -27,20 +27,20 @@ let currentDescription = "";
 let lastPlace = null;
 let lastData = null;
 
-// 2. Save and load the last searched city
-function loadLastCity() {
+// 2. Save and load the last shown city (name, country and coordinates)
+function loadLastPlace() {
   try {
-    const saved = localStorage.getItem("lastCity");
-    if (saved) return saved;
+    const saved = localStorage.getItem("lastPlace");
+    if (saved) return JSON.parse(saved);
   } catch (error) {
-    // if storage fails, use the default
+    // if storage fails, we use the default city
   }
-  return "London";
+  return null;
 }
 
-function saveLastCity(name) {
+function saveLastPlace(place) {
   try {
-    localStorage.setItem("lastCity", name);
+    localStorage.setItem("lastPlace", JSON.stringify(place));
   } catch (error) {
     // the app still works, it just won't remember
   }
@@ -158,7 +158,7 @@ function showWeather(place, data) {
   hero.classList.toggle("sky-night", !isDay);
 
   heroTemp.textContent = formatTemp(current.temperature_2m, true);
-  heroPlace.textContent = `${place.name}, ${place.country}`;
+  heroPlace.textContent = place.country ? `${place.name}, ${place.country}` : place.name;
 
   currentTimezone = data.timezone;
   currentDescription = weather.text;
@@ -179,12 +179,32 @@ function showWeather(place, data) {
   drawChart(daily);
 }
 
-// 7. Find the city, then get its weather
+// 7. Get the weather for a place we already know (name, country, latitude, longitude)
+async function loadCity(place) {
+  statusEl.textContent = "Loading...";
+
+  try {
+    const weatherRes = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}` +
+        `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day` +
+        `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum` +
+        `&timezone=auto&forecast_days=5`
+    );
+    const data = await weatherRes.json();
+
+    showWeather(place, data);
+    saveLastPlace(place);
+    statusEl.textContent = "";
+  } catch (error) {
+    statusEl.textContent = "Something went wrong. Please try again.";
+  }
+}
+
+// 8. Find a city by name, then load it
 async function getWeather(query) {
   statusEl.textContent = "Loading...";
 
   try {
-    // Turn the city name into coordinates
     const geoRes = await fetch(
       `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1`
     );
@@ -195,26 +215,20 @@ async function getWeather(query) {
       return;
     }
 
-    const place = geoData.results[0];
+    const found = geoData.results[0];
 
-    // Get current weather, sunrise/sunset, rain and the 5-day forecast
-    const weatherRes = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}` +
-        `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day` +
-        `&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum` +
-        `&timezone=auto&forecast_days=5`
-    );
-    const data = await weatherRes.json();
-
-    showWeather(place, data);
-    saveLastCity(place.name);
-    statusEl.textContent = "";
+    await loadCity({
+      name: found.name,
+      country: found.country,
+      latitude: found.latitude,
+      longitude: found.longitude
+    });
   } catch (error) {
     statusEl.textContent = "Something went wrong. Please try again.";
   }
 }
 
-// 8. Search when the button is clicked or Enter is pressed
+// 9. Search when the button is clicked or Enter is pressed
 function handleSearch() {
   const city = cityInput.value.trim();
   if (city) getWeather(city);
@@ -225,11 +239,16 @@ cityInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") handleSearch();
 });
 
-// 9. When the °C / °F toggle changes, redraw with the saved data
+// 10. When the °C / °F toggle changes, redraw with the saved data
 document.addEventListener("unitchange", () => {
   if (lastPlace && lastData) showWeather(lastPlace, lastData);
 });
 
-// 10. Start: show the last city, and keep the hero clock ticking
-getWeather(loadLastCity());
+// 11. Start: show the last city (or London the first time), and keep the clock ticking
+const savedPlace = loadLastPlace();
+if (savedPlace) {
+  loadCity(savedPlace);
+} else {
+  getWeather("London");
+}
 setInterval(updateHeroClock, 1000);

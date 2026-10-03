@@ -1,12 +1,12 @@
 // 1. Default cities (shown the first time you open the page)
 const defaultCities = [
-  { name: "New York", zone: "America/New_York", lat: 40.71, lon: -74.01 },
-  { name: "London", zone: "Europe/London", lat: 51.51, lon: -0.13 },
-  { name: "Dubai", zone: "Asia/Dubai", lat: 25.2, lon: 55.27 },
-  { name: "Mumbai", zone: "Asia/Kolkata", lat: 19.08, lon: 72.88 },
-  { name: "Tokyo", zone: "Asia/Tokyo", lat: 35.68, lon: 139.69 },
-  { name: "Sydney", zone: "Australia/Sydney", lat: -33.87, lon: 151.21 },
-  { name: "Los Angeles", zone: "America/Los_Angeles", lat: 34.05, lon: -118.24 }
+  { name: "New York", country: "United States", zone: "America/New_York", lat: 40.71, lon: -74.01 },
+  { name: "London", country: "United Kingdom", zone: "Europe/London", lat: 51.51, lon: -0.13 },
+  { name: "Dubai", country: "United Arab Emirates", zone: "Asia/Dubai", lat: 25.2, lon: 55.27 },
+  { name: "Mumbai", country: "India", zone: "Asia/Kolkata", lat: 19.08, lon: 72.88 },
+  { name: "Tokyo", country: "Japan", zone: "Asia/Tokyo", lat: 35.68, lon: 139.69 },
+  { name: "Sydney", country: "Australia", zone: "Australia/Sydney", lat: -33.87, lon: 151.21 },
+  { name: "Los Angeles", country: "United States", zone: "America/Los_Angeles", lat: 34.05, lon: -118.24 }
 ];
 
 // 2. Grab elements from the page
@@ -37,7 +37,14 @@ function saveCities() {
 
 let dashboardCities = loadCities();
 
-// 5. Find out what hour it is (0 to 23) in a given time zone
+// 5. Remember each city's latest weather (temperature is always stored in °C)
+const cityWeatherData = {};
+
+function cityKey(city) {
+  return `${city.name}|${city.zone}`;
+}
+
+// 6. Find out what hour it is (0 to 23) in a given time zone
 function getHour(zone, now) {
   const hour = new Intl.DateTimeFormat("en-US", {
     timeZone: zone,
@@ -48,7 +55,7 @@ function getHour(zone, now) {
   return Number(hour);
 }
 
-// 6. Build the cards (empty time and weather spots with ids)
+// 7. Build the cards (empty time and weather spots with ids)
 function buildCards() {
   if (dashboardCities.length === 0) {
     clockGrid.innerHTML = "<p>No cities yet. Add one above.</p>";
@@ -58,7 +65,7 @@ function buildCards() {
   clockGrid.innerHTML = dashboardCities
     .map(
       (city, i) => `
-      <div class="clock-card" id="card-${i}">
+      <div class="clock-card" id="card-${i}" data-index="${i}" title="Click to see full weather">
         <button class="remove-btn" data-index="${i}" title="Remove">✕</button>
         <h3>${city.name} <span id="daynight-${i}"></span></h3>
         <div class="time" id="time-${i}"></div>
@@ -70,7 +77,7 @@ function buildCards() {
     .join("");
 }
 
-// 7. Update the time, date, and day/night look (runs every second)
+// 8. Update the time, date, and day/night look (runs every second)
 function updateTimes() {
   const now = new Date();
 
@@ -105,7 +112,21 @@ function updateTimes() {
   });
 }
 
-// 8. Get the weather for every city
+// 9. Show the saved weather on one card (uses the current °C / °F choice)
+function renderCityWeather(city, i) {
+  const data = cityWeatherData[cityKey(city)];
+  const weatherEl = document.getElementById(`weather-${i}`);
+  if (!data || !weatherEl) return;
+
+  const weather = describeWeather(data.code);
+  weatherEl.textContent = `${weather.icon} ${formatTemp(data.temp, true)} · ${weather.text}`;
+}
+
+function renderAllCityWeather() {
+  dashboardCities.forEach((city, i) => renderCityWeather(city, i));
+}
+
+// 10. Get the weather for every city
 async function loadWeather() {
   await Promise.all(
     dashboardCities.map(async (city, i) => {
@@ -115,13 +136,15 @@ async function loadWeather() {
         );
         const data = await res.json();
         const current = data.current_weather;
-        const weather = describeWeather(current.weathercode);
+
+        cityWeatherData[cityKey(city)] = {
+          temp: current.temperature,
+          code: current.weathercode
+        };
 
         // The list may have changed while we waited, so check first
-        const weatherEl = document.getElementById(`weather-${i}`);
-        if (!weatherEl || dashboardCities[i] !== city) return;
-
-        weatherEl.textContent = `${weather.icon} ${Math.round(current.temperature)}°C · ${weather.text}`;
+        if (dashboardCities[i] !== city) return;
+        renderCityWeather(city, i);
       } catch (error) {
         const weatherEl = document.getElementById(`weather-${i}`);
         if (weatherEl && dashboardCities[i] === city) {
@@ -132,14 +155,15 @@ async function loadWeather() {
   );
 }
 
-// 9. Redraw everything after the list changes
+// 11. Redraw everything after the list changes
 function refreshDashboard() {
   buildCards();
   updateTimes();
+  renderAllCityWeather();
   loadWeather();
 }
 
-// 10. Add a new city
+// 12. Add a new city
 async function addCity() {
   const query = addCityInput.value.trim();
   if (!query) return;
@@ -170,6 +194,7 @@ async function addCity() {
 
     dashboardCities.push({
       name: found.name,
+      country: found.country,
       zone: found.timezone,
       lat: found.latitude,
       lon: found.longitude
@@ -184,24 +209,45 @@ async function addCity() {
   }
 }
 
-// 11. Remove a city when its ✕ button is clicked
+// 13. Clicks on the grid: the ✕ button removes a city, a card click opens it
 clockGrid.addEventListener("click", (event) => {
-  if (!event.target.classList.contains("remove-btn")) return;
+  // Remove button
+  if (event.target.classList.contains("remove-btn")) {
+    const index = Number(event.target.dataset.index);
+    dashboardCities.splice(index, 1);
 
-  const index = Number(event.target.dataset.index);
-  dashboardCities.splice(index, 1);
+    saveCities();
+    refreshDashboard();
+    return;
+  }
 
-  saveCities();
-  refreshDashboard();
+  // Click anywhere else on a card: show that city in the main dashboard
+  const card = event.target.closest(".clock-card");
+  if (!card) return;
+
+  const city = dashboardCities[Number(card.dataset.index)];
+  if (!city) return;
+
+  loadCity({
+    name: city.name,
+    country: city.country,
+    latitude: city.lat,
+    longitude: city.lon
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
-// 12. Buttons and the Enter key
+// 14. Buttons and the Enter key
 addCityBtn.addEventListener("click", addCity);
 addCityInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") addCity();
 });
 
-// 13. Start everything
+// 15. When the °C / °F toggle changes, redraw the temperatures
+document.addEventListener("unitchange", renderAllCityWeather);
+
+// 16. Start everything
 refreshDashboard();
 setInterval(updateTimes, 1000);
 setInterval(loadWeather, 10 * 60 * 1000);
