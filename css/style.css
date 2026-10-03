@@ -39,3 +39,34 @@ body {
   font-size: 32px;
   margin: 6px 0;
 }
+
+.clock-grid {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+.clock-card {
+  background: #1f2937;
+  color: white;
+  border-radius: 10px;
+  padding: 14px;
+  width: 160px;
+}
+
+.clock-card h3 {
+  margin: 0 0 8px;
+}
+
+.clock-card .time {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.clock-card .date {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
