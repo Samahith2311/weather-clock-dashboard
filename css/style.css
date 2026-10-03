@@ -63,6 +63,7 @@ body {
 .top-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -91,6 +92,27 @@ body {
   padding: 8px 10px;
   cursor: pointer;
   font-size: 14px;
+}
+
+.unit-toggle {
+  display: flex;
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.unit-toggle button {
+  border: none;
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.unit-toggle button.active {
+  background: var(--accent);
+  color: white;
 }
 
 .theme-btn {

@@ -23,6 +23,10 @@ const chartLabelsEl = document.getElementById("chartLabels");
 let currentTimezone = null;
 let currentDescription = "";
 
+// These keep the last weather data, so we can redraw when °C / °F changes
+let lastPlace = null;
+let lastData = null;
+
 // 2. Save and load the last searched city
 function loadLastCity() {
   try {
@@ -109,7 +113,7 @@ function drawChart(daily) {
     .map(
       (p, i) => `
       <circle cx="${p.x}" cy="${p.y}" r="4" class="chart-dot"></circle>
-      <text x="${p.x}" y="${p.y - 12}" text-anchor="middle" class="chart-text">${Math.round(temps[i])}°</text>
+      <text x="${p.x}" y="${p.y - 12}" text-anchor="middle" class="chart-text">${formatTemp(temps[i])}</text>
     `
     )
     .join("");
@@ -140,6 +144,10 @@ function drawChart(daily) {
 
 // 6. Put all the weather data on the page
 function showWeather(place, data) {
+  // Keep the data so the °C / °F toggle can redraw it later
+  lastPlace = place;
+  lastData = data;
+
   const current = data.current;
   const daily = data.daily;
   const weather = describeWeather(current.weather_code);
@@ -149,7 +157,7 @@ function showWeather(place, data) {
   hero.classList.toggle("sky-day", isDay);
   hero.classList.toggle("sky-night", !isDay);
 
-  heroTemp.textContent = `${Math.round(current.temperature_2m)}°`;
+  heroTemp.textContent = formatTemp(current.temperature_2m, true);
   heroPlace.textContent = `${place.name}, ${place.country}`;
 
   currentTimezone = data.timezone;
@@ -217,6 +225,11 @@ cityInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") handleSearch();
 });
 
-// 9. Start: show the last city, and keep the hero clock ticking
+// 9. When the °C / °F toggle changes, redraw with the saved data
+document.addEventListener("unitchange", () => {
+  if (lastPlace && lastData) showWeather(lastPlace, lastData);
+});
+
+// 10. Start: show the last city, and keep the hero clock ticking
 getWeather(loadLastCity());
 setInterval(updateHeroClock, 1000);

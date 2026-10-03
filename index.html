@@ -9,13 +9,17 @@
 <body>
   <div class="app">
 
-    <!-- Top bar: title, search, dark mode -->
+    <!-- Top bar: title, search, unit toggle, dark mode -->
     <header class="topbar">
       <h1 class="brand">Weather & World Clock</h1>
       <div class="top-actions">
         <div class="search">
           <input type="text" id="cityInput" placeholder="Enter city name">
           <button id="searchBtn" title="Search">🔍</button>
+        </div>
+        <div class="unit-toggle">
+          <button id="unitC" class="active">°C</button>
+          <button id="unitF">°F</button>
         </div>
         <button id="themeBtn" class="theme-btn">🌙 Dark mode</button>
       </div>
@@ -115,6 +119,7 @@
 
   <script src="js/theme.js"></script>
   <script src="js/utils.js"></script>
+  <script src="js/units.js"></script>
   <script src="js/clock.js"></script>
   <script src="js/main.js"></script>
 </body>
