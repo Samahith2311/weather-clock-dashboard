@@ -4,18 +4,7 @@ const searchBtn = document.getElementById("searchBtn");
 const result = document.getElementById("result");
 const forecastEl = document.getElementById("forecast");
 
-// 2. Turn a weather code number into an emoji and a word
-function describeWeather(code) {
-  if (code === 0) return { icon: "☀️", text: "Clear" };
-  if (code <= 3) return { icon: "⛅", text: "Partly cloudy" };
-  if (code <= 48) return { icon: "🌫️", text: "Fog" };
-  if (code <= 67) return { icon: "🌧️", text: "Rain" };
-  if (code <= 77) return { icon: "❄️", text: "Snow" };
-  if (code <= 82) return { icon: "🌦️", text: "Showers" };
-  return { icon: "⛈️", text: "Thunderstorm" };
-}
-
-// 3. Show the 5 forecast cards
+// 2. Show the 5 forecast cards
 function showForecast(daily) {
   forecastEl.innerHTML = "";
 
@@ -36,7 +25,7 @@ function showForecast(daily) {
   });
 }
 
-// 4. Find the city, then get its weather
+// 3. Find the city, then get its weather
 async function getWeather(city) {
   result.textContent = "Loading...";
   forecastEl.innerHTML = "";
@@ -76,7 +65,7 @@ async function getWeather(city) {
   }
 }
 
-// 5. Run the search when the button is clicked
+// 4. Run the search when the button is clicked
 searchBtn.addEventListener("click", () => {
   const city = cityInput.value.trim();
   if (city) getWeather(city);

@@ -53,7 +53,7 @@ body {
   color: white;
   border-radius: 10px;
   padding: 14px;
-  width: 160px;
+  width: 170px;
 }
 
 .clock-card h3 {
@@ -69,4 +69,11 @@ body {
   margin-top: 6px;
   font-size: 14px;
   color: #cbd5e1;
+}
+
+.clock-card .city-weather {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #4b5563;
+  font-size: 15px;
 }
