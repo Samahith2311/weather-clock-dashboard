@@ -7,26 +7,111 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <button id="themeBtn" class="theme-btn">🌙 Dark mode</button>
+  <div class="app">
 
-  <h1>Weather & World Clock Dashboard</h1>
+    <!-- Top bar: title, search, dark mode -->
+    <header class="topbar">
+      <h1 class="brand">Weather & World Clock</h1>
+      <div class="top-actions">
+        <div class="search">
+          <input type="text" id="cityInput" placeholder="Enter city name">
+          <button id="searchBtn" title="Search">🔍</button>
+        </div>
+        <button id="themeBtn" class="theme-btn">🌙 Dark mode</button>
+      </div>
+    </header>
 
-  <h2>World Clock</h2>
-  <div class="add-city">
-    <input type="text" id="addCityInput" placeholder="Add a city to the dashboard">
-    <button id="addCityBtn">Add City</button>
+    <p id="status" class="status"></p>
+
+    <!-- Hero banner for the searched city -->
+    <section id="hero" class="hero sky-day">
+      <div class="sun"></div>
+
+      <svg class="hills" viewBox="0 0 800 200" preserveAspectRatio="none" aria-hidden="true">
+        <path class="hill-back" d="M0 120 Q150 60 300 110 T600 90 T800 110 V200 H0 Z"/>
+        <path class="hill-front" d="M0 150 Q200 110 400 150 T800 140 V200 H0 Z"/>
+        <polygon class="pine" points="50,150 66,95 82,150"/>
+        <polygon class="pine" points="85,155 98,110 111,155"/>
+        <polygon class="pine" points="680,145 696,90 712,145"/>
+        <polygon class="pine" points="715,150 728,108 741,150"/>
+        <polygon class="pine" points="745,148 760,100 775,148"/>
+      </svg>
+
+      <div class="hero-content">
+        <div>
+          <div id="heroTemp" class="hero-temp">--</div>
+          <div id="heroPlace" class="hero-place">Loading...</div>
+        </div>
+        <div class="hero-right">
+          <div id="heroTime" class="hero-time">--:--</div>
+          <div id="heroDay" class="hero-day"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stat cards, rain bar and chart -->
+    <section class="panels">
+      <div class="left-col">
+        <div class="stats">
+          <div class="stat">
+            <span class="stat-icon">💧</span>
+            <div>
+              <div class="stat-label">Humidity</div>
+              <div id="humidity" class="stat-value">--</div>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">🌇</span>
+            <div>
+              <div class="stat-label">Sunset</div>
+              <div id="sunset" class="stat-value">--</div>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">💨</span>
+            <div>
+              <div class="stat-label">Wind</div>
+              <div id="wind" class="stat-value">--</div>
+            </div>
+          </div>
+          <div class="stat">
+            <span class="stat-icon">🌅</span>
+            <div>
+              <div class="stat-label">Sunrise</div>
+              <div id="sunrise" class="stat-value">--</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rain-bar">
+          <div>
+            <div class="rain-title">Rain today</div>
+            <strong id="rainToday">--</strong>
+          </div>
+          <div class="rain-right">
+            <div class="rain-title">Next 5 days</div>
+            <strong id="rainTotal">--</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-panel">
+        <h3>Temperature forecast (daily high)</h3>
+        <svg id="chart" viewBox="0 0 500 160"></svg>
+        <div id="chartLabels" class="chart-labels"></div>
+      </div>
+    </section>
+
+    <!-- World clock -->
+    <h2 class="section-title">World Clock</h2>
+    <div class="add-city">
+      <input type="text" id="addCityInput" placeholder="Add a city to the dashboard">
+      <button id="addCityBtn">Add City</button>
+    </div>
+    <div id="addMessage" class="message"></div>
+    <div id="clockGrid" class="clock-grid"></div>
+
   </div>
-  <div id="addMessage" class="message"></div>
-  <div id="clockGrid" class="clock-grid"></div>
-
-  <h2>Search Weather</h2>
-  <div class="search">
-    <input type="text" id="cityInput" placeholder="Enter a city name">
-    <button id="searchBtn">Search</button>
-  </div>
-
-  <div id="result"></div>
-  <div id="forecast" class="forecast"></div>
 
   <script src="js/theme.js"></script>
   <script src="js/utils.js"></script>
