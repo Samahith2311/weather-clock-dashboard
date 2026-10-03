@@ -4,15 +4,23 @@ body {
   margin: 40px;
 }
 
-.search input {
+.search input,
+.add-city input {
   padding: 8px;
   font-size: 16px;
 }
 
-.search button {
+.search button,
+.add-city button {
   padding: 8px 14px;
   font-size: 16px;
   cursor: pointer;
+}
+
+.message {
+  min-height: 20px;
+  margin: 8px 0 16px;
+  color: #b45309;
 }
 
 #result {
@@ -49,6 +57,7 @@ body {
 }
 
 .clock-card {
+  position: relative;
   background: #1f2937;
   color: white;
   border-radius: 10px;
@@ -77,3 +86,18 @@ body {
   border-top: 1px solid #4b5563;
   font-size: 15px;
 }
+
+.remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  color: white;
+} 
