@@ -37,7 +37,18 @@ function saveCities() {
 
 let dashboardCities = loadCities();
 
-// 5. Build the cards (empty time and weather spots with ids)
+// 5. Find out what hour it is (0 to 23) in a given time zone
+function getHour(zone, now) {
+  const hour = new Intl.DateTimeFormat("en-US", {
+    timeZone: zone,
+    hour: "numeric",
+    hourCycle: "h23"
+  }).format(now);
+
+  return Number(hour);
+}
+
+// 6. Build the cards (empty time and weather spots with ids)
 function buildCards() {
   if (dashboardCities.length === 0) {
     clockGrid.innerHTML = "<p>No cities yet. Add one above.</p>";
@@ -47,9 +58,9 @@ function buildCards() {
   clockGrid.innerHTML = dashboardCities
     .map(
       (city, i) => `
-      <div class="clock-card">
+      <div class="clock-card" id="card-${i}">
         <button class="remove-btn" data-index="${i}" title="Remove">✕</button>
-        <h3>${city.name}</h3>
+        <h3>${city.name} <span id="daynight-${i}"></span></h3>
         <div class="time" id="time-${i}"></div>
         <div class="date" id="date-${i}"></div>
         <div class="city-weather" id="weather-${i}">Loading...</div>
@@ -59,14 +70,16 @@ function buildCards() {
     .join("");
 }
 
-// 6. Update only the time and date text (runs every second)
+// 7. Update the time, date, and day/night look (runs every second)
 function updateTimes() {
   const now = new Date();
 
   dashboardCities.forEach((city, i) => {
+    const cardEl = document.getElementById(`card-${i}`);
     const timeEl = document.getElementById(`time-${i}`);
     const dateEl = document.getElementById(`date-${i}`);
-    if (!timeEl || !dateEl) return;
+    const dayNightEl = document.getElementById(`daynight-${i}`);
+    if (!cardEl || !timeEl || !dateEl || !dayNightEl) return;
 
     timeEl.textContent = now.toLocaleTimeString("en-US", {
       timeZone: city.zone,
@@ -81,10 +94,18 @@ function updateTimes() {
       month: "short",
       day: "numeric"
     });
+
+    // Day is 6 AM to 6 PM in that city, otherwise it is night
+    const hour = getHour(city.zone, now);
+    const isDay = hour >= 6 && hour < 18;
+
+    cardEl.classList.toggle("day", isDay);
+    cardEl.classList.toggle("night", !isDay);
+    dayNightEl.textContent = isDay ? "☀️" : "🌙";
   });
 }
 
-// 7. Get the weather for every city
+// 8. Get the weather for every city
 async function loadWeather() {
   await Promise.all(
     dashboardCities.map(async (city, i) => {
@@ -111,14 +132,14 @@ async function loadWeather() {
   );
 }
 
-// 8. Redraw everything after the list changes
+// 9. Redraw everything after the list changes
 function refreshDashboard() {
   buildCards();
   updateTimes();
   loadWeather();
 }
 
-// 9. Add a new city
+// 10. Add a new city
 async function addCity() {
   const query = addCityInput.value.trim();
   if (!query) return;
@@ -163,7 +184,7 @@ async function addCity() {
   }
 }
 
-// 10. Remove a city when its ✕ button is clicked
+// 11. Remove a city when its ✕ button is clicked
 clockGrid.addEventListener("click", (event) => {
   if (!event.target.classList.contains("remove-btn")) return;
 
@@ -174,13 +195,13 @@ clockGrid.addEventListener("click", (event) => {
   refreshDashboard();
 });
 
-// 11. Buttons and the Enter key
+// 12. Buttons and the Enter key
 addCityBtn.addEventListener("click", addCity);
 addCityInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") addCity();
 });
 
-// 12. Start everything
+// 13. Start everything
 refreshDashboard();
 setInterval(updateTimes, 1000);
 setInterval(loadWeather, 10 * 60 * 1000);

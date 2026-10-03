@@ -1,13 +1,46 @@
+/* Colors for light mode. Dark mode overrides them below. */
+:root {
+  --bg: #ffffff;
+  --text: #111827;
+  --panel: #f0f4f8;
+  --input-bg: #ffffff;
+  --input-border: #9ca3af;
+}
+
+body.dark {
+  --bg: #0f172a;
+  --text: #e5e7eb;
+  --panel: #1e293b;
+  --input-bg: #1e293b;
+  --input-border: #475569;
+}
+
 body {
   font-family: Arial, sans-serif;
   text-align: center;
   margin: 40px;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+
+.theme-btn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .search input,
 .add-city input {
   padding: 8px;
   font-size: 16px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
 }
 
 .search button,
@@ -37,7 +70,7 @@ body {
 }
 
 .day-card {
-  background: #f0f4f8;
+  background: var(--panel);
   border-radius: 10px;
   padding: 14px;
   width: 110px;
@@ -58,11 +91,54 @@ body {
 
 .clock-card {
   position: relative;
-  background: #1f2937;
-  color: white;
   border-radius: 10px;
   padding: 14px;
   width: 170px;
+  transition: background 0.5s;
+}
+
+/* Night: dark card */
+.clock-card.night {
+  background: #1f2937;
+  color: white;
+}
+
+.clock-card.night .date {
+  color: #cbd5e1;
+}
+
+.clock-card.night .city-weather {
+  border-top: 1px solid #4b5563;
+}
+
+.clock-card.night .remove-btn {
+  color: #9ca3af;
+}
+
+.clock-card.night .remove-btn:hover {
+  color: white;
+}
+
+/* Day: light blue card */
+.clock-card.day {
+  background: linear-gradient(#93c5fd, #dbeafe);
+  color: #0f172a;
+}
+
+.clock-card.day .date {
+  color: #334155;
+}
+
+.clock-card.day .city-weather {
+  border-top: 1px solid #60a5fa;
+}
+
+.clock-card.day .remove-btn {
+  color: #475569;
+}
+
+.clock-card.day .remove-btn:hover {
+  color: #0f172a;
 }
 
 .clock-card h3 {
@@ -77,13 +153,11 @@ body {
 .clock-card .date {
   margin-top: 6px;
   font-size: 14px;
-  color: #cbd5e1;
 }
 
 .clock-card .city-weather {
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid #4b5563;
   font-size: 15px;
 }
 
@@ -93,11 +167,6 @@ body {
   right: 8px;
   background: none;
   border: none;
-  color: #9ca3af;
   font-size: 16px;
   cursor: pointer;
 }
-
-.remove-btn:hover {
-  color: white;
-} 
