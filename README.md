@@ -4,6 +4,10 @@ A simple, good-looking dashboard that shows **live weather** and **local time** 
 
 Built with plain HTML, CSS and JavaScript. No frameworks, no build step, and no API key needed.
 
+## Live demo
+
+🌐 **[weatherworldclockdashboard.netlify.app](https://weatherworldclockdashboard.netlify.app/)**
+
 ## Features
 
 - **City weather search:** current temperature, conditions, humidity, wind speed, sunrise and sunset
@@ -26,6 +30,7 @@ Built with plain HTML, CSS and JavaScript. No frameworks, no build step, and no 
 - Browser `Intl` APIs for time zones and clocks
 - Browser `localStorage` for saving cities, theme, unit and last city
 - [Google Sans](https://fonts.google.com/) font via Google Fonts
+- [Netlify](https://www.netlify.com/) for hosting
 
 ## Getting started
 
@@ -83,7 +88,6 @@ The scripts are loaded in this order in `index.html`: `theme.js`, `utils.js`, `u
 - Detect the user's location automatically
 - Real photo or illustration for the banner
 - Wind speed unit toggle (km/h and mph)
-- Publish with GitHub Pages
 
 ## Credits
 
